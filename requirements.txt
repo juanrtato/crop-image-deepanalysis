@@ -1,0 +1,6 @@
+numpy==2.2.3
+pandas==2.2.3
+wfdb==4.2.0
+matplotlib==3.10.1
+#ast==0.0.2
+seaborn==0.13.2
