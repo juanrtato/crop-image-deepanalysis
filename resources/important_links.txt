@@ -1,3 +1,0 @@
-PASTIS24 Dataset: https://drive.google.com/drive/folders/1Lm0repzD_1NVcECsrwF8Q3bP2XEp2a0y
-PASTIS Repo: https://github.com/VSainteuf/pastis-benchmark/tree/main
-Image-Captioning: https://towardsdatascience.com/image-captioning-transformer-mode-on/
