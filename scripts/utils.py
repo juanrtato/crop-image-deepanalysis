@@ -148,3 +148,42 @@ def plot_sample_rgb(inputs, labels, patch_id, sample_idx=-1):
     plt.tight_layout()
     plt.show()
 
+
+def plot_mean_band_profile(inputs, sample_idx):
+    """
+    Plots the mean value of each band over time for a single sample.
+
+    Args:
+        inputs: tensor of shape [N, T, H, W, B]
+        sample_idx: index of the sample to analyze
+    """
+    sample = inputs[sample_idx]  # shape: [T, H, W, B]
+    num_times = sample.shape[0]
+
+    df = pd.DataFrame(columns=['time', 'value', 'band'])
+
+    for t_index in range(num_times):
+        # Calculate the mean pixel value for each band at time t_index
+        mean_pixel_values = sample[t_index, :, :, :10].mean(dim=(0, 1))  # Mean over height and width
+        
+        for band_index, mean_value in enumerate(mean_pixel_values):
+            df = pd.concat([df, pd.DataFrame([{
+                'time': t_index,
+                'value': mean_value.item(),  # Convert tensor to Python float
+                'band': f"B{band_index + 1}"
+            }])], ignore_index=True)
+
+    # Plot the figure
+    plt.figure(figsize=(10, 6))
+    for band in sorted(df['band'].unique()):
+        band_df = df[df['band'] == band]
+        plt.plot(band_df['time'], band_df['value'], label=band)
+
+    plt.xlabel("Time")
+    plt.ylabel("Mean Value")
+    plt.title(f"Mean Pixel Band - Sample {sample_idx}")
+    plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+    plt.grid(True)
+    plt.tight_layout()
+    plt.show()
+
