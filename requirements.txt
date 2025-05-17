@@ -6,3 +6,6 @@ geopandas==1.0.1
 torch==2.7.0
 pyyaml==6.0
 torchvision==0.22.0
+einops==0.3.2
+transformers==4.51.3
+hf-xet==1.1.1
