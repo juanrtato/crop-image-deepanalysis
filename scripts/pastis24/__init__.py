@@ -22,27 +22,40 @@ def get_dataloaders(config):
     eval_config  = config['DATASETS']['eval']
     eval_config['bidir_input'] = model_config['architecture'] == "ConvBiRNN"
     dataloaders = {}
-    
-    # TRAIN data -------------------------------------------------------------------------------------------------------
+    dataset_type = eval_config.get('dataset_type', None)
     train_config['base_dir'] = DATASET_INFO[train_config['dataset']][train_config['dataset']]['basedir']
     train_config['paths'] = DATASET_INFO[train_config['dataset']][train_config['dataset']]['paths_train']
-    if 'PASTIS' in train_config['dataset']:
-        dataloaders['train'] = get_pastis_dataloader(
-            paths_file=train_config['paths'], root_dir=train_config['base_dir'],
-            transform=PASTIS_segmentation_transform(model_config, is_training=True),
-            batch_size=train_config['batch_size'], shuffle=True, num_workers=train_config['num_workers'],
-            return_paths=True)
-
-    # EVAL data --------------------------------------------------------------------------------------------------------
     eval_config['base_dir'] = DATASET_INFO[eval_config['dataset']][train_config['dataset']]['basedir']
     eval_config['paths'] = DATASET_INFO[eval_config['dataset']][train_config['dataset']]['paths_eval']
-    if 'PASTIS' in eval_config['dataset']:
-        dataloaders['eval'] = get_pastis_dataloader(
-            paths_file=eval_config['paths'], root_dir=eval_config['base_dir'],
-            transform=PASTIS_segmentation_transform(model_config, is_training=False),
-            batch_size=eval_config['batch_size'], shuffle=False, num_workers=eval_config['num_workers'],
-            return_paths=True)
+    if dataset_type == "PASTIS2SEQUENCE":
+        print("Loading PASTIS2SEQUENCE dataset...")
+        if 'PASTIS' in train_config['dataset']:
+            dataloaders['train'] = get_pastis_dataloader(
+                paths_file=train_config['paths'], root_dir=train_config['base_dir'],
+                transform=PASTIS_segmentation_transform(model_config, is_training=True),
+                batch_size=train_config['batch_size'], shuffle=True, num_workers=train_config['num_workers'],
+                return_paths=True)
+        if 'PASTIS' in eval_config['dataset']:
+            dataloaders['eval'] = get_pastis_dataloader(
+                paths_file=eval_config['paths'], root_dir=eval_config['base_dir'],
+                transform=PASTIS_segmentation_transform(model_config, is_training=False),
+                batch_size=eval_config['batch_size'], shuffle=False, num_workers=eval_config['num_workers'],
+                return_paths=True)
+        print("PASTIS2SEQUENCE dataset loaded!")
+    else:
+        if 'PASTIS' in train_config['dataset']:
+            dataloaders['train'] = get_pastis_dataloader(
+                paths_file=train_config['paths'], root_dir=train_config['base_dir'],
+                transform=PASTIS_segmentation_transform(model_config, is_training=True),
+                batch_size=train_config['batch_size'], shuffle=True, num_workers=train_config['num_workers'],
+                return_paths=False)
 
+        if 'PASTIS' in eval_config['dataset']:
+            dataloaders['eval'] = get_pastis_dataloader(
+                paths_file=eval_config['paths'], root_dir=eval_config['base_dir'],
+                transform=PASTIS_segmentation_transform(model_config, is_training=False),
+                batch_size=eval_config['batch_size'], shuffle=False, num_workers=eval_config['num_workers'],
+                return_paths=False)
     return dataloaders
 
 
