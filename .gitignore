@@ -1,1 +1,3 @@
 datalake/PASTIS24/
+__pycache__/
+*.py[cod]
