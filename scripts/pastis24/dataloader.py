@@ -1,5 +1,7 @@
 from __future__ import print_function, division
+import json
 import os
+from utils import mask_to_text
 import torch
 import pandas as pd
 from torch.utils.data import Dataset
@@ -8,7 +10,8 @@ import pickle
 import warnings
 warnings.filterwarnings("ignore")
 
-
+with open("../datalake/label_names_en.json", "r") as json_file:
+    LABEL_NAMES_EN = json.load(json_file)
 
 def get_distr_dataloader(paths_file, root_dir, rank, world_size, transform=None, batch_size=32, num_workers=4,
                          shuffle=True, return_paths=False):
@@ -25,7 +28,6 @@ def get_distr_dataloader(paths_file, root_dir, rank, world_size, transform=None,
 def get_dataloader(paths_file, root_dir, transform=None, batch_size=32, num_workers=4, shuffle=True,
                    return_paths=False, my_collate=None):
     dataset = SatImDataset(csv_file=paths_file, root_dir=root_dir, transform=transform, return_paths=return_paths)
-    print(f"Dataset length: {len(dataset)}")
     dataloader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle=shuffle, num_workers=num_workers,
                                              collate_fn=my_collate)
     return dataloader
@@ -62,14 +64,17 @@ class SatImDataset(Dataset):
 
         with open(img_name, 'rb') as handle:
             sample = pickle.load(handle, encoding='latin1')
-        #print(f"Sample keys: {sample.keys()}")
+
         if self.transform:
             sample = self.transform(sample)
+        
+        label_mask = sample['labels']
+        text = mask_to_text(label_mask[:, :, 0], LABEL_NAMES_EN)
 
         if self.return_paths:
-            return sample, img_name
-        
-        return sample
+            return sample, text, img_name
+
+        return sample, text
 
     def read(self, idx, abs=False):
         """
