@@ -1,3 +1,4 @@
 datalake/PASTIS24/
+datalake/model_vtt_full.pth
 __pycache__/
 *.py[cod]
