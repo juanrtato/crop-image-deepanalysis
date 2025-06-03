@@ -9,7 +9,7 @@ from .config_files_utils import get_params_values
 from scipy import ndimage
 
 
-def PASTIS_segmentation_transform(model_config, is_training):
+def PASTIS_segmentation_transform(model_config, is_training, normalize=True):
     """
     """
     dataset_img_res = 24
@@ -19,7 +19,8 @@ def PASTIS_segmentation_transform(model_config, is_training):
     inputs_backward = get_params_values(model_config, 'inputs_backward', False)
     transform_list = []
     transform_list.append(ToTensor())                                  # data from numpy arrays to torch.float32
-    transform_list.append(Normalize())                                 # normalize all inputs individually
+    if normalize:
+        transform_list.append(Normalize())                                 # normalize all inputs individually
 
     if dataset_img_res != input_img_res:
         transform_list.append(
