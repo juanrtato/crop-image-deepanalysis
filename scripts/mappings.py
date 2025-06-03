@@ -17,16 +17,16 @@ INITIAL_MSGS_ES = [
 ]
 
 END_MSGS_ES = [
-    "lo que constituye una fracción considerable de la superficie agrícola total: ",
-    "lo que representa un porcentaje importante de la superficie agrícola total: ",
-    "lo que equivale a una porción significativa de la tierra cultivada en la región: ",
-    "lo que corresponde a una parte relevante de la superficie cultivada en la zona: ",
-    "lo que representa una porción destacada de la superficie agrícola de la región: ",
-    "lo que abarca una fracción destacada de la superficie cultivable total: ",
-    "lo que constituye una porción importante de la superficie agrícola de la zona: ",
-    "lo que corresponde a una fracción considerable de la superficie agrícola disponible: ",
-    "lo que constituye una parte esencial de la superficie agrícola total: ",
-    "lo que representa una porción significativa de la tierra cultivada total: "
+    "lo que constituye una fracción considerable de la superficie agrícola total. ",
+    "lo que representa un porcentaje importante de la superficie agrícola total. ",
+    "lo que equivale a una porción significativa de la tierra cultivada en la región. ",
+    "lo que corresponde a una parte relevante de la superficie cultivada en la zona. ",
+    "lo que representa una porción destacada de la superficie agrícola de la región. ",
+    "lo que abarca una fracción destacada de la superficie cultivable total. ",
+    "lo que constituye una porción importante de la superficie agrícola de la zona. ",
+    "lo que corresponde a una fracción considerable de la superficie agrícola disponible. ",
+    "lo que constituye una parte esencial de la superficie agrícola total. ",
+    "lo que representa una porción significativa de la tierra cultivada total. "
 ]
 
 NO_CROP_MSGS_ES = [
@@ -74,16 +74,16 @@ INITIAL_MSGS_EN = [
 ]
 
 END_MSGS_EN = [
-    "which accounts for a considerable fraction of the total agricultural area: ",
-    "which represents a significant percentage of the total agricultural area: ",
-    "which equals a meaningful portion of the cultivated land in the region: ",
-    "which corresponds to a relevant part of the cultivated area in this zone: ",
-    "which represents a prominent portion of the region’s agricultural area: ",
-    "which covers a notable fraction of the total arable land: ",
-    "which constitutes an important part of the agricultural area in the region: ",
-    "which corresponds to a considerable share of the available agricultural area: ",
-    "which forms an essential part of the total agricultural area: ",
-    "which represents a significant portion of the total cultivated land: "
+    "which accounts for a considerable fraction of the total agricultural area. ",
+    "which represents a significant percentage of the total agricultural area. ",
+    "which equals a meaningful portion of the cultivated land in the region. ",
+    "which corresponds to a relevant part of the cultivated area in this zone. ",
+    "which represents a prominent portion of the region’s agricultural area. ",
+    "which covers a notable fraction of the total arable land. ",
+    "which constitutes an important part of the agricultural area in the region. ",
+    "which corresponds to a considerable share of the available agricultural area. ",
+    "which forms an essential part of the total agricultural area. ",
+    "which represents a significant portion of the total cultivated land. "
 ]
 
 NO_CROP_MSGS_EN = [
@@ -110,4 +110,128 @@ EXTENTION_MSGS_EN = [
     "with a coverage of approximately",
     "representing an area of around",
     "with a dimension close to"
+]
+
+NO_PLANTING_MSGS_EN = [
+    "no planting period was detected for the first planting period of the crop {crop}.",
+    "the first planting period of the crop {crop} cannot be determined.",
+    "the crop {crop} does not have a defined first planting period.",
+    "the first planting period for the crop {crop} is not available.",
+    "the crop {crop} does not have a known first planting period.",
+    "the first planting period for the crop {crop} is not specified.",
+    "the crop {crop} does not have a first planting period recorded.",
+    "the first planting period for the crop {crop} is unknown.",
+    "the crop {crop} does not have a first planting period established.",
+    "the first planting period for the crop {crop} is not detected.",
+    "there is no information available about the first planting period for the crop {crop}.",
+    "unable to retrieve the first planting period for the crop {crop}.",
+    "the crop {crop} lacks sufficient data to determine its first planting period.",
+    "I couldn't establish the first planting period for the crop {crop}.",
+    "no data found regarding the first planting schedule of the crop {crop}.",
+    "the first planting window for the crop {crop} could not be identified.",
+    "planting time details for the first planting period of the crop {crop} are missing.",
+    "the system couldn't detect any first planting information for the crop {crop}.",
+    "the crop {crop} has no recorded data about its first planting period.",
+    "It's unclear when the crop {crop} should be first planted."
+]
+
+
+HARVEST_WITHOUT_PLANTING_EN = [
+    "However, it was likely harvested around {harvest_time}.",
+    "Still, the harvest for the crop {crop} appears to have occurred around {harvest_time}.",
+    "Nevertheless, available data suggests the crop {crop} was harvested in {harvest_time}.",
+    "Despite the missing planting information, harvesting likely took place in {harvest_time}.",
+    "Yet, the crop {crop} was probably collected around {harvest_time}.",
+    "Although the planting time is unknown, the crop {crop} seems to have been harvested near {harvest_time}.",
+    "Harvest estimates for the crop {crop} indicate it was gathered around {harvest_time}.",
+    "But harvesting of the crop {crop} is estimated to have occurred in {harvest_time}.",
+    "Still, data shows that the crop {crop} was likely harvested in {harvest_time}.",
+    "However, harvesting likely happened around {harvest_time} for the crop {crop}.",
+    "Harvesting seems to have taken place in {harvest_time}, even though the planting date is unclear.",
+    "the crop {crop} may have reached maturity around {harvest_time}, despite unknown sowing data.",
+    "While the sowing period is unavailable, harvest was likely in {harvest_time}.",
+    "Harvest records suggest that the crop {crop} was collected in {harvest_time}, even if its planting date is missing.",
+    "Although planting could not be identified, harvesting is expected to have occurred around {harvest_time}.",
+    "Still, the crop {crop} appears to have been harvested sometime near {harvest_time}.",
+    "Even though the sowing period is not recorded, {crop} was most likely harvested in {harvest_time}.",
+    "Despite the unknown planting phase, harvesting was probably done around {harvest_time}.",
+    "Harvest time estimates place the crop {crop}'s collection around {harvest_time}.",
+    "No planting time was detected, but harvest happened around {harvest_time}."
+]
+
+MULTI_PLANT_HARVEST_COMBINED_EN = [
+    "the crop {crop} was planted in {plant_times} and harvested in {harvest_times}.",
+    "{crop} had multiple planting windows ({plant_times}) followed by harvests in {harvest_times}.",
+    "detected planting phases for {crop} include {plant_times}, with harvests occurring around {harvest_times}.",
+    "It seems that {crop} was sown during {plant_times} and later collected in {harvest_times}.",
+    "the growing cycles for {crop} started around {plant_times} and ended in {harvest_times}."
+]
+
+TRANSITION_CONNECTORS_EN = [
+    "Regarding the planting and harvesting times,",
+    "Concerning the seasonal periods,",
+    "In terms of cultivation timelines,",
+    "Focusing on the crop cycles,",
+    "Looking at the planting and harvest schedules,",
+    "Now, let's examine the planting and harvesting periods,",
+    "Moving on to the crop growth periods,",
+    "As for the planting and harvest information,",
+    "Turning to the seasonal agricultural cycles,",
+    "When it comes to planting and harvesting,",
+    "Discussing the timing of planting and harvesting,",
+    "With respect to the crop periods,",
+    "Examining the sowing and harvesting times,",
+    "Considering the crop seasonal phases,",
+    "Let's review the planting and harvesting windows,",
+    "On the topic of crop development stages,",
+    "Regarding crop cultivation timings,",
+    "Addressing the planting and harvest phases,",
+    "Looking into the sowing and reaping periods,",
+    "Focusing on the timing of agricultural activities,"
+]
+
+PLANT_HARVEST_COMBINED_EN = [
+    "the crop {crop} was sown around {plant_time} and likely harvested in {harvest_time}",
+    "{crop} appears to have been planted in {plant_time} and harvested approximately in {harvest_time}.",
+    "the cultivation of {crop} likely started in {plant_time} and concluded around {harvest_time}.",
+    "It is estimated that the crop {crop} was seeded in {plant_time} and reaped in {harvest_time}.",
+    "data indicates the crop {crop} was planted near {plant_time} and harvested by {harvest_time}.",
+    "the life cycle of {crop} spanned from around {plant_time} to about {harvest_time}.",
+    "{crop} was likely cultivated beginning in {plant_time} and harvested in {harvest_time}.",
+    "planting of the crop {crop} probably took place in {plant_time}, followed by harvesting in {harvest_time}.",
+    "the growing season of {crop} started in {plant_time} and ended around {harvest_time}.",
+    "{crop} was sown in {plant_time} and harvested in {harvest_time}.",
+    "the period between {plant_time} and {harvest_time} defines the estimated growing cycle for {crop}.",
+    "the crop {crop} had a planting period starting in {plant_time}, with harvesting occurring in {harvest_time}.",
+    "the observed agricultural timeline for {crop} suggests planting in {plant_time} and harvesting in {harvest_time}.",
+    "the farming schedule indicates that {crop} was planted around {plant_time} and harvested by {harvest_time}.",
+    "estimates point to a planting time in {plant_time} and a harvest period in {harvest_time} for the crop {crop}.",
+    "{crop} went through a growing cycle from {plant_time} to {harvest_time}, according to the data.",
+    "It seems that {crop} was cultivated starting in {plant_time}, with harvest expected in {harvest_time}.",
+    "the crop {crop} likely experienced its growth period between {plant_time} and {harvest_time}.",
+    "the crop {crop} was seeded in {plant_time} and reached maturity by {harvest_time}.",
+    "{crop} followed a cycle beginning in {plant_time} and concluding in {harvest_time}."
+]
+
+OTHER_CONNECTOR_ALTERNATIVES = [
+    "Additionally,",
+    "Moreover,",
+    "Furthermore,",
+    "In addition,",
+    "What's more,",
+    "Besides,",
+    "As well,",
+    "Along with that,",
+    "Not only that,",
+    "To add to that,",
+    "Equally important,",
+    "Similarly,",
+    "Correspondingly,",
+    "On top of that,",
+    "In the same way,",
+    "By the same token,",
+    "Likewise,",
+    "Plus,",
+    "Together with that,",
+    "Beyond that,"
 ]
