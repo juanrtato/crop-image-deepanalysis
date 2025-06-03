@@ -1,12 +1,14 @@
 from __future__ import print_function, division
 import json
 import os
-from utils import mask_to_text
+from utils import calculate_ndvi_by_crop, clean_crop_times, estimate_planting_harvest_periods_by_crop, mask_to_text, mask_to_text_ndvi
+from pastis24.data_transforms import Normalize
 import torch
 import pandas as pd
 from torch.utils.data import Dataset
 import torch.utils.data
 import pickle
+from torchvision import transforms
 import warnings
 warnings.filterwarnings("ignore")
 
@@ -65,16 +67,31 @@ class SatImDataset(Dataset):
         with open(img_name, 'rb') as handle:
             sample = pickle.load(handle, encoding='latin1')
 
+        # Crear transform sin Normalize
+        if self.transform:
+            transform_wo_norm = transforms.Compose(
+                [t for t in self.transform.transforms if not isinstance(t, Normalize)]
+            )
+            sample_wo_norm = transform_wo_norm(sample.copy())
+        else:
+            sample_wo_norm = sample.copy()
+
+        # Usar sample sin normalización para calcular NDVI
+        label_mask = sample_wo_norm['labels']
+        inputs = sample_wo_norm['inputs']
+        cleaned_ndvi_by_crop = clean_crop_times(inputs, label_mask[:, :, 0])
+        planting_harvest = estimate_planting_harvest_periods_by_crop(cleaned_ndvi_by_crop)
+        text = mask_to_text_ndvi(label_mask[:, :, 0], planting_harvest)
+
+        # Aplicar transformaciones completas (con Normalize) a sample original
         if self.transform:
             sample = self.transform(sample)
-        
-        label_mask = sample['labels']
-        text = mask_to_text(label_mask[:, :, 0], LABEL_NAMES_EN)
 
         if self.return_paths:
             return sample, text, img_name
 
         return sample, text
+
 
     def read(self, idx, abs=False):
         """
