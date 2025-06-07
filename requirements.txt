@@ -9,3 +9,5 @@ torchvision==0.22.0
 einops==0.3.2
 transformers==4.51.3
 hf-xet==1.1.1
+dateparser==1.2.1
+humanize==4.12.3
