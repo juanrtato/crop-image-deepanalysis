@@ -57,7 +57,9 @@ class VisionToTextModel(nn.Module):
         )
 
         return outputs.loss, outputs.logits
-    
+
+
+
 class Adapter(nn.Module):
     def __init__(self, input_dim=128, bottleneck_dim=64):
         super().__init__()

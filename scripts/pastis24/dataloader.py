@@ -1,6 +1,7 @@
 from __future__ import print_function, division
 import json
 import os
+import re
 from utils import calculate_ndvi_by_crop, clean_crop_times, estimate_planting_harvest_periods_by_crop, mask_to_text, mask_to_text_ndvi
 from pastis24.data_transforms import Normalize
 import torch
@@ -28,8 +29,8 @@ def get_distr_dataloader(paths_file, root_dir, rank, world_size, transform=None,
 
 
 def get_dataloader(paths_file, root_dir, transform=None, batch_size=32, num_workers=4, shuffle=True,
-                   return_paths=False, my_collate=None):
-    dataset = SatImDataset(csv_file=paths_file, root_dir=root_dir, transform=transform, return_paths=return_paths)
+                   return_paths=False, my_collate=None, format_dates=False):
+    dataset = SatImDataset(csv_file=paths_file, root_dir=root_dir, transform=transform, return_paths=return_paths, format_dates=format_dates)
     dataloader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle=shuffle, num_workers=num_workers,
                                              collate_fn=my_collate)
     return dataloader
@@ -38,7 +39,7 @@ def get_dataloader(paths_file, root_dir, transform=None, batch_size=32, num_work
 class SatImDataset(Dataset):
     """Satellite Images dataset."""
 
-    def __init__(self, csv_file, root_dir, transform=None, multilabel=False, return_paths=False):
+    def __init__(self, csv_file, root_dir, transform=None, multilabel=False, return_paths=False, format_dates=False):
         """
         Args:
             csv_file (string): Path to the csv file with annotations.
@@ -54,6 +55,7 @@ class SatImDataset(Dataset):
         self.transform = transform
         self.multilabel = multilabel
         self.return_paths = return_paths
+        self.format_dates = format_dates
 
     def __len__(self):
         return len(self.data_paths)
@@ -80,7 +82,15 @@ class SatImDataset(Dataset):
         label_mask = sample_wo_norm['labels']
         inputs = sample_wo_norm['inputs']
         cleaned_ndvi_by_crop = clean_crop_times(inputs, label_mask[:, :, 0])
-        planting_harvest = estimate_planting_harvest_periods_by_crop(cleaned_ndvi_by_crop)
+        patch_id = 'UNKNOWN'
+        path_patch = img_name
+        match = re.match(r"(\d+)_\d+\.pickle", os.path.basename(path_patch))
+        if match:
+            patch_id = match.group(1)
+        planting_harvest = estimate_planting_harvest_periods_by_crop(
+            cleaned_ndvi_by_crop, self.format_dates, patch_id
+        )
+        #text = mask_to_text(label_mask[:, :, 0])
         text = mask_to_text_ndvi(label_mask[:, :, 0], planting_harvest)
 
         # Aplicar transformaciones completas (con Normalize) a sample original

@@ -29,6 +29,8 @@ def get_dataloaders(config):
     eval_config['paths'] = DATASET_INFO[eval_config['dataset']][train_config['dataset']]['paths_eval']
     normalize_eval = eval_config.get('normalize', True)
     normalize_train = train_config.get('normalize', True)
+    format_dates_eval = eval_config.get('format_dates', False)
+    format_dates_train = train_config.get('format_dates', False)
     if dataset_type == "PASTIS2SEQUENCE":
         print("Loading PASTIS2SEQUENCE dataset...")
         if 'PASTIS' in train_config['dataset']:
@@ -36,13 +38,13 @@ def get_dataloaders(config):
                 paths_file=train_config['paths'], root_dir=train_config['base_dir'],
                 transform=PASTIS_segmentation_transform(model_config, True, normalize_train),
                 batch_size=train_config['batch_size'], shuffle=True, num_workers=train_config['num_workers'],
-                return_paths=True)
+                return_paths=True, format_dates=format_dates_train)
         if 'PASTIS' in eval_config['dataset']:
             dataloaders['eval'] = get_pastis_dataloader(
                 paths_file=eval_config['paths'], root_dir=eval_config['base_dir'],
                 transform=PASTIS_segmentation_transform(model_config, False, normalize_eval),
                 batch_size=eval_config['batch_size'], shuffle=False, num_workers=eval_config['num_workers'],
-                return_paths=True)
+                return_paths=True, format_dates=format_dates_eval)
         print("PASTIS2SEQUENCE dataset loaded!")
     else:
         if 'PASTIS' in train_config['dataset']:

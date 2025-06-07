@@ -1,5 +1,6 @@
 import os
 import random
+import re
 import torch
 import pandas as pd
 import numpy as np
@@ -9,6 +10,7 @@ import json
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 import torch.nn.functional as F
+import dateparser
 
 from mappings import *
 
@@ -83,13 +85,14 @@ class CustomSequenceDataset:
             yield batch_data
 
 
-def get_date_from_id(patch_id, index, metadata_df):
+def get_date_from_id(patch_id, index, metadata_df, humanize=False):
     """
     Get the date corresponding to a specific patch ID and index.
     Args:
         patch_id (str): Identifier for the patch.
         index (int): Index of the date to retrieve.
         metadata_df (pd.DataFrame): DataFrame containing metadata information.
+        humanize (bool): If True, return a human-readable date format.
     
     Returns:
         str: Date in the format YYYY/MM/DD or None if not found.
@@ -99,6 +102,8 @@ def get_date_from_id(patch_id, index, metadata_df):
         date_dict = row.iloc[0]['dates-S2']
         date = date_dict.get(str(index), None)
         date = str(datetime.strptime(str(date), "%Y%m%d").strftime("%Y/%m/%d")) if date else None
+        if humanize:
+            date = humanize_date(date)
         return date
     else:
         return None
@@ -223,38 +228,68 @@ def mask_to_text(mask_array: np.ndarray, label_names: dict = LABEL_NAMES_EN, lan
         str: Text representation of the segmentation mask.
     """
     if language == "es":
-        initial_msg = INITIAL_MSGS_ES
-        end_msg = END_MSGS_ES
-        no_crop_msg = NO_CROP_MSGS_ES
-        ext_msg = EXTENTION_MSGS_ES
-    elif language == "en":
-        initial_msg = INITIAL_MSGS_EN
-        end_msg = END_MSGS_EN
-        no_crop_msg = NO_CROP_MSGS_EN
-        ext_msg = EXTENTION_MSGS_EN
-    else:
-        raise ValueError("Language not supported. Use 'es' for Spanish or 'en' for English.")
+        print("Language not supported yet, using English.")
+    initial_msgs = INITIAL_MSGS_EN 
+    end_msgs = END_MSGS_EN
+    no_crop_msgs = NO_CROP_MSGS_EN
+    ext_msgs = EXTENTION_MSGS_EN
         
-    initial_msg = initial_msg[np.random.randint(0, len(initial_msg))]
     area_per_class = get_area_per_class(mask_array, label_names)
-    class_names = list(area_per_class.keys())
-    if len(class_names) == 0 or all(
-        class_name in ["Etiqueta vacía", "Fondo", "Background", "Void label"]
-        for class_name in class_names
-    ):
-        return no_crop_msg[np.random.randint(0, len(no_crop_msg))]
+    valid_classes = [
+        c for c in area_per_class.keys()
+        if c not in ["Etiqueta vacía", "Fondo", "Background", "Void label"]
+    ]
 
-    total_area = sum(area_per_class.values())
-    for class_name, area in area_per_class.items():
-        if class_name not in ["Etiqueta vacía", "Fondo", "Background", "Void label"]:
-            initial_msg += f"{class_name} {ext_msg[np.random.randint(0, len(ext_msg))]} {area} m2, "
-        #else:
-        # TODO: que hacer con el fondo y etiqueta vacia?
+    if not valid_classes:
+        return no_crop_msgs[np.random.randint(0, len(no_crop_msgs))]
 
-    initial_msg += f"{end_msg[np.random.randint(0, len(end_msg))]}"
-    text_representation = initial_msg + "\n"
+    initial_msg_template = initial_msgs[np.random.randint(0, len(initial_msgs))]
+    text_representation = initial_msg_template.format(crop=valid_classes[0])
 
+    area = area_per_class[valid_classes[0]]
+    ext = ext_msgs[np.random.randint(0, len(ext_msgs))]
+    text_representation += f"{ext} {area} m2"
+
+    for class_name in valid_classes[1:]:
+        area = area_per_class[class_name]
+        ext = ext_msgs[np.random.randint(0, len(ext_msgs))]
+        text_representation += f", {class_name} {ext} {area} m2"
+
+    end_msg_selected = end_msgs[np.random.randint(0, len(end_msgs))]
+    total_area_info = random.choices([True, False], weights=[0.65, 0.35])[0]
+    if total_area_info:
+        aprox_values = [
+            "approximately",
+            "approx.",
+            "around",
+            "about",
+        ]
+        total_area = sum(area_per_class.values())
+        total_area_msg = f" ({random.choice(aprox_values)} {total_area} m2)"
+        end_msg_selected += f"{total_area_msg}."
+    else:
+        end_msg_selected += "."
+    text_representation += f" {end_msg_selected}\n"
     return text_representation
+
+
+def format_date_phrase(date_str: str) -> str:
+    """
+    Format a date using the correct preposition based on the date string.
+    Args:
+        date_str (str): Date string.
+    
+    Returns:
+        str: Formatted date string with appropriate preposition.
+
+    """
+    if random.choices([True, False], weights=[0.5, 0.5])[0]:
+        return f"{random.choice(['around', 'about', 'by'])} {date_str}"
+    else:
+        if bool(re.search(r'\b\d{1,2}, \d{4}\b', date_str)):
+            return f"on {date_str}"
+        else:
+            return f"in {date_str}"
 
     
 def mask_to_text_ndvi(mask_array: np.ndarray, planting_harvest: dict, labels: dict = LABEL_NAMES_EN) -> str:
@@ -284,7 +319,7 @@ def mask_to_text_ndvi(mask_array: np.ndarray, planting_harvest: dict, labels: di
             no_planting_text = random.choice(NO_PLANTING_MSGS_EN).format(crop=crop_name)
             harvest_text = random.choice(HARVEST_WITHOUT_PLANTING_EN).format(crop=crop_name, harvest_time=harvest)
             ndvi_analysis.append(f"{no_planting_text} {harvest_text}")
-
+        
         if len(known_periods) == 1:
             plant, harvest = known_periods[0]
             msg = random.choice(PLANT_HARVEST_COMBINED_EN).format(crop=crop_name, plant_time=plant, harvest_time=harvest)
@@ -293,8 +328,8 @@ def mask_to_text_ndvi(mask_array: np.ndarray, planting_harvest: dict, labels: di
         elif len(known_periods) > 1:
             plant_list = [p for (p, _) in known_periods]
             harvest_list = [h for (_, h) in known_periods]
-            plant_str = ", ".join(plant_list)
-            harvest_str = ", ".join(harvest_list)
+            plant_str = " and ".join(plant_list)
+            harvest_str = " and ".join(harvest_list)
             msg = random.choice(MULTI_PLANT_HARVEST_COMBINED_EN).format(
                 crop=crop_name, plant_times=plant_str, harvest_times=harvest_str
             )
@@ -305,7 +340,7 @@ def mask_to_text_ndvi(mask_array: np.ndarray, planting_harvest: dict, labels: di
         return fist_text
     else:
         text_parts = [ndvi_analysis[0]] + [f"{random.choice(OTHER_CONNECTOR_ALTERNATIVES)} {sentence}" for sentence in ndvi_analysis[1:]]
-        return fist_text + "\n\n" + transition_connector + " " + " ".join(text_parts)
+        return fist_text + "\n" + transition_connector + " " + " ".join(text_parts)
 
 
 def calculate_ndvi(inputs):
@@ -457,7 +492,9 @@ def merge_periods(periods):
     return merged
 
 
-def estimate_planting_harvest_periods_by_crop(ndvi_by_crop, delta_thresh_start=0.05, delta_thresh_end=0.05, min_duration=3):
+def estimate_planting_harvest_periods_by_crop(
+        ndvi_by_crop, format_dates, patch_id, delta_thresh_start=0.05, delta_thresh_end=0.05, min_duration=5
+    ):
     """
     Estimate planting and harvest periods for each crop based on NDVI values.
     This function analyzes the NDVI time series for each crop and detects periods of significant increase (planting)
@@ -465,6 +502,8 @@ def estimate_planting_harvest_periods_by_crop(ndvi_by_crop, delta_thresh_start=0
 
     Args:
         ndvi_by_crop (dict): {crop_name: NDVI tensor [T]} (can contain NaN values).
+        format_dates (bool): If True, the times will be formatted as dates.
+        patch_id (str): Identifier for the patch, used for date formatting.
         delta_thresh_start (float): Delta threshold for significant increase to consider planting.
         delta_thresh_end (float): Delta threshold for significant decrease to consider harvest.
         min_duration (int): Minimum duration (in time steps) for a valid planting/harvest period.
@@ -524,11 +563,66 @@ def estimate_planting_harvest_periods_by_crop(ndvi_by_crop, delta_thresh_start=0
 
         # Extraer solo las tuplas (start,end)
         best_periods = [v[0] for v in best_periods_by_start.values()]
+        best_periods = merge_periods(best_periods)
+        crop_periods[crop_name] = best_periods
 
-        crop_periods[crop_name] = merge_periods(best_periods)
-
+    if format_dates:
+        for crop_name, periods in crop_periods.items():
+            formatted_periods = []
+            for start, end in periods:
+                start_date = get_date_from_id(patch_id, start, METADATA_DF, humanize=True)
+                end_date = get_date_from_id(patch_id, end, METADATA_DF, humanize=True)
+                if 'by an unknown point in time' in start_date:
+                    continue
+                if start_date and end_date:
+                    formatted_periods.append((start_date, end_date))
+                else:
+                    formatted_periods.append((start, end))
+            crop_periods[crop_name] = formatted_periods
+    else:
+        for crop_name, periods in crop_periods.items():
+            formatted_periods = []
+            for start, end in periods:
+                if start == 'unknown':
+                    continue
+                formatted_periods.append((f"on time T{start}", f"on time T{end}"))
+            crop_periods[crop_name] = formatted_periods
     return crop_periods
 
+
+def humanize_date(date: str) -> str:
+    """
+    Convert a date string in the format "YYYY-MM-DD" to a human-readable format.
+    Args:
+        date (str): Date string in the format "YYYY-MM-DD".
+    Returns:
+        str: Human-readable date string in the format "principios/mediados/finales de mes de año".
+    """
+    try: 
+        date = dateparser.parse(date, settings={'DATE_ORDER': 'YMD'})
+    except:
+        print(f"Error parsing date: {date}")
+        date = None
+    if not date:
+        return "by an unknown point in time"
+    human_date_version = random.choices([True, False], weights=[0.65, 0.35])[0]
+    month = date.strftime("%B")
+    year = date.year
+    day = date.day
+    if human_date_version:
+        early_options = EARLY_DATE
+        mid_options = MID_DATE
+        late_options = LATE_DATE
+        if day <= 10:
+            phrase = random.choice(early_options).format(month=month, year=year)
+            
+        elif day <= 20:
+            phrase = random.choice(mid_options).format(month=month, year=year)
+        else:
+            phrase = random.choice(late_options).format(month=month, year=year)
+        return format_date_phrase(phrase)
+    else:
+        return format_date_phrase(f"{month} {day}, {year}")
 
 
 def clean_crop_times(inputs, sample_labels):
