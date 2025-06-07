@@ -23,31 +23,35 @@
             "dataset": "PASTIS24_fold1",
             "label_map": null,
             "max_seq_len": 60,
-            "batch_size": 24,
+            "batch_size": 12,
             "extra_data": null,
             "num_workers": 4,
             "bidir_input": false,
             "base_dir": "../PASTIS24",
             "paths": "../PASTIS24/fold-paths/fold_4_paths.csv",
-            "dataset_type": "PASTIS2SEQUENCE"
+            "dataset_type": "PASTIS2SEQUENCE",
+            "normalize": true,
+            "format_dates": false
         },
         "eval": {
             "dataset": "PASTIS24_fold1",
             "label_map": null,
             "max_seq_len": 60,
-            "batch_size": 24,
+            "batch_size": 12,
             "extra_data": null,
             "num_workers": 4,
             "bidir_input": false,
             "base_dir": "../PASTIS24",
             "paths": "../PASTIS24/fold-paths/fold_5_paths.csv",
-            "dataset_type": "PASTIS2SEQUENCE"
+            "dataset_type": "PASTIS2SEQUENCE",
+            "normalize": true,
+            "format_dates": false
         },
         "test": {
             "dataset": "PASTIS24_fold1",
             "label_map": null,
             "max_seq_len": 60,
-            "batch_size": 24,
+            "batch_size": 12,
             "extra_data": null,
             "num_workers": 4
         }
