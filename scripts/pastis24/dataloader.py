@@ -11,6 +11,7 @@ import torch.utils.data
 import pickle
 from torchvision import transforms
 import warnings
+import copy
 warnings.filterwarnings("ignore")
 
 with open("../datalake/label_names_en.json", "r") as json_file:
@@ -69,31 +70,33 @@ class SatImDataset(Dataset):
         with open(img_name, 'rb') as handle:
             sample = pickle.load(handle, encoding='latin1')
 
-        # Crear transform sin Normalize
+        # transform sample without normalization
         if self.transform:
             transform_wo_norm = transforms.Compose(
                 [t for t in self.transform.transforms if not isinstance(t, Normalize)]
             )
-            sample_wo_norm = transform_wo_norm(sample.copy())
+            sample_wo_norm = transform_wo_norm(copy.deepcopy(sample))
         else:
-            sample_wo_norm = sample.copy()
+            sample_wo_norm = copy.deepcopy(sample)
 
-        # Usar sample sin normalización para calcular NDVI
+        # use the sample without normalization to calculate ndvi and planting/harvest periods
         label_mask = sample_wo_norm['labels']
         inputs = sample_wo_norm['inputs']
         cleaned_ndvi_by_crop = clean_crop_times(inputs, label_mask[:, :, 0])
+
         patch_id = 'UNKNOWN'
         path_patch = img_name
         match = re.match(r"(\d+)_\d+\.pickle", os.path.basename(path_patch))
         if match:
             patch_id = match.group(1)
+
         planting_harvest = estimate_planting_harvest_periods_by_crop(
             cleaned_ndvi_by_crop, self.format_dates, patch_id
         )
         #text = mask_to_text(label_mask[:, :, 0])
         text = mask_to_text_ndvi(label_mask[:, :, 0], planting_harvest)
 
-        # Aplicar transformaciones completas (con Normalize) a sample original
+        # apply the transforms (including normalization) to the sample
         if self.transform:
             sample = self.transform(sample)
 

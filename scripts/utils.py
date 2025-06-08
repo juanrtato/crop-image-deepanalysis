@@ -601,7 +601,6 @@ def humanize_date(date: str) -> str:
     try: 
         date = dateparser.parse(date, settings={'DATE_ORDER': 'YMD'})
     except:
-        print(f"Error parsing date: {date}")
         date = None
     if not date:
         return "by an unknown point in time"
