@@ -590,11 +590,13 @@ def estimate_planting_harvest_periods_by_crop(
     return crop_periods
 
 
-def humanize_date(date: str) -> str:
+def humanize_date(date: str, avoid_year: bool = True, exact_dates: bool = False) -> str:
     """
     Convert a date string in the format "YYYY-MM-DD" to a human-readable format.
     Args:
         date (str): Date string in the format "YYYY-MM-DD".
+        avoid_year (bool): If True, the year will not be included in the output.
+        exact_dates (bool): If True, some dates will be formatted as "month day, year".
     Returns:
         str: Human-readable date string in the format "principios/mediados/finales de mes de año".
     """
@@ -604,24 +606,29 @@ def humanize_date(date: str) -> str:
         date = None
     if not date:
         return "by an unknown point in time"
-    human_date_version = random.choices([True, False], weights=[0.65, 0.35])[0]
     month = date.strftime("%B")
     year = date.year
+    if avoid_year:
+        year = ''
     day = date.day
-    if human_date_version:
-        early_options = EARLY_DATE
-        mid_options = MID_DATE
-        late_options = LATE_DATE
-        if day <= 10:
-            phrase = random.choice(early_options).format(month=month, year=year)
-            
-        elif day <= 20:
-            phrase = random.choice(mid_options).format(month=month, year=year)
-        else:
-            phrase = random.choice(late_options).format(month=month, year=year)
-        return format_date_phrase(phrase)
+    early_options = EARLY_DATE
+    mid_options = MID_DATE
+    late_options = LATE_DATE
+
+    if exact_dates:
+        human_date_version = random.choices([True, False], weights=[0.65, 0.35])[0]
+        if not human_date_version:
+            return format_date_phrase(f"{month} {day}, {year}")
+    
+    if day <= 10:
+        phrase = random.choice(early_options).format(month=month, year=year).rstrip()
+    elif day <= 20:
+        phrase = random.choice(mid_options).format(month=month, year=year).rstrip()
     else:
-        return format_date_phrase(f"{month} {day}, {year}")
+        phrase = random.choice(late_options).format(month=month, year=year).rstrip()
+
+    return format_date_phrase(phrase)
+
 
 
 def clean_crop_times(inputs, sample_labels):
