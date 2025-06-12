@@ -1,0 +1,5 @@
+model_path: ../datalake/TSVIT/best.pth
+dataloader_config: ../datalake/config_vtt.json
+epochs: 20
+lr: 0.0001
+batch_size: 8
