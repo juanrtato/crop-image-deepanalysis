@@ -10,7 +10,7 @@ class VisionToTextModel(nn.Module):
         self.tokenizer = GPT2Tokenizer.from_pretrained(decoder_model)
         self.tokenizer.pad_token = self.tokenizer.eos_token
         self.device = next(self.parameters()).device
-        print(f"Decoder input size: {self.decoder.config.n_embd}") # 768
+        #print(f"Decoder input size: {self.decoder.config.n_embd}") # 768
         # Projection
         self.projector = nn.Linear(input_dim, self.decoder.config.n_embd)  # Project visual embeddings to LLM dimension
         for param in self.encoder.parameters():
@@ -34,7 +34,7 @@ class VisionToTextModel(nn.Module):
         text_emb = self.decoder.transformer.wte(input_ids)              # [B, T_text, D_dec]
         #print("image_sequence.shape:", image_sequence.shape)
         #print("visual_emb.shape:", visual_emb.shape)
-        print(f"visual_proj: {visual_proj.shape}, text_emb: {text_emb.shape}")
+        #print(f"visual_proj: {visual_proj.shape}, text_emb: {text_emb.shape}")
         # Concatenate visual projection with text embeddings
         combined_embeddings = torch.cat([visual_proj, text_emb], dim=1)  # [B, 1 + T_text, D_dec]
 
