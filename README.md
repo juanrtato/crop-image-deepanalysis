@@ -17,7 +17,7 @@ By combining computer vision and natural language processing, this approach seek
 
 Precision Agriculture · Computer Vision · Semantic Segmentation · Large Language Models · Multimodal Systems · Knowledge Transfer
 
-# Instructions to Set Up the Environment
+# Instructions to Set Up the Local Environment
 
 1. **Create a new environment** with Python 3.10:
    ```bash
