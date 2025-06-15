@@ -1,0 +1,23 @@
+name: train-vtt-tsvit-vdates-dropout_v3
+experiment_name: vtt-training-20-epochs
+compute: azureml:gpu-t4-nvidia
+description: Train VTT model with Azure ML
+display_name: vtt-train-job-20-epochs
+
+code: .
+command: >-
+  bash -c "
+    ln -s ${{inputs.dataset_root}} ../datalake &&
+    python scripts/train.py --param_file params.yaml
+  "
+
+environment:
+  conda_file: env/conda.yaml
+  image: mcr.microsoft.com/azureml/openmpi4.1.0-ubuntu20.04:20231002.v1
+
+inputs:
+  dataset_root:
+    type: uri_folder
+    path: azureml:pastisdata@latest
+    mode: ro_mount
+
