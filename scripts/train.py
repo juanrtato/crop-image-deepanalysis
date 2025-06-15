@@ -1,4 +1,5 @@
 import argparse
+import json
 import yaml
 import torch
 from pastis24 import get_dataloaders
@@ -23,20 +24,24 @@ def training_step(model, batch, optimizer, device):
 
     return loss.item()
 
-def evaluate(model, dataloader, device):
+def evaluation_step(model, batch, device):
     model.eval()
-    total_loss = 0
+    sample_dict, texts, img_path = batch
+
+    image_sequence = sample_dict['inputs'].to(device)
+    tokenizer = model.tokenizer(texts, padding=True, truncation=True, return_tensors="pt").to(device)
+    input_ids = tokenizer.input_ids
+
     with torch.no_grad():
-        for sample in dataloader:
-            loss = training_step(model, sample, optimizer=None, device=device)
-            total_loss += loss
-    return total_loss / len(dataloader)
+        loss, _ = model(image_sequence, input_ids)
+    return loss.item()
 
 def main(args):
     with open(args.dataloader_config, "r") as f:
         config = yaml.safe_load(f)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
+    print(f"Config dates format train: {config.get('DATASETS', {}).get('train', {}).get('format_dates')}")
+    print(f"Config dates format eval: {config.get('DATASETS', {}).get('eval', {}).get('format_dates')}")
     dataloader = get_dataloaders(config)
 
     encoder = model_architecture.get_model(config, device)
@@ -46,21 +51,43 @@ def main(args):
     model_vtt = visiontotextmodel.VisionToTextModel(encoder, decoder_model="gpt2", input_dim=128).to(device)
     optimizer = torch.optim.Adam(model_vtt.parameters(), lr=1e-4)
     model_vtt.train()
+    train_losses = []
+    eval_losses = []
+    os.makedirs("outputs", exist_ok=True)
     for epoch in range(args.epochs):
         print(f"[Epoch {epoch+1}/{args.epochs}]")
-        epoch_loss = 0.0
+        train_loss = 0.0
         for batch in dataloader['train']:
             loss = training_step(model_vtt, batch, optimizer, device)
-            epoch_loss += loss
-        avg_loss = epoch_loss / len(dataloader['train'])
-        print(f"Loss: {avg_loss:.4f}")
+            train_loss += loss
+        avg_train_loss = train_loss / len(dataloader['train'])
+        print(f"Train Loss: {avg_train_loss:.4f}")
+        train_losses.append(avg_train_loss)
 
-    val_loss = evaluate(model_vtt, dataloader['eval'], device)
-    print(f"Eval Loss: {val_loss:.4f}")
+        eval_loss = 0.0
+        for batch in dataloader['eval']:
+            loss = evaluation_step(model_vtt, batch, device)
+            eval_loss += loss
+        avg_eval_loss = eval_loss / len(dataloader['eval'])
+        print(f"Eval Loss: {avg_eval_loss:.4f}")
+        eval_losses.append(avg_eval_loss)
 
-    os.makedirs("outputs", exist_ok=True)
+        torch.save(
+            model_vtt.state_dict(),
+            f"outputs/model_vtt_gpt2_epoch_{epoch+1}.pth"
+        )
+        print(f"✅ Modelo guardado en outputs/model_vtt_gpt2_epoch_{epoch+1}.pth")
+    
     torch.save(model_vtt.state_dict(), "outputs/model_vtt_gpt2.pth")
     print("✅ Modelo guardado en outputs/model_vtt_gpt2.pth")
+
+    with open("outputs/losses_model_vtt_gpt2.json", "w") as f:
+        json.dump(
+            {
+                "train_loss": train_losses,
+                "eval_loss": eval_losses
+            }, f
+        )
 
 
 if __name__ == "__main__":
