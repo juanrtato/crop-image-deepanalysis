@@ -1,6 +1,8 @@
-datalake/PASTIS24/
+/datalake/
 datalake/model_vtt_full.pth
 .ipynb_checkpoints/
 unsloth_compiled_cache/
 __pycache__/
 *.py[cod]
+script_data.py
+scripts/outputs
