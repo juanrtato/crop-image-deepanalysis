@@ -31,7 +31,7 @@
             "paths": "../PASTIS24/fold-paths/fold_4_paths.csv",
             "dataset_type": "PASTIS2SEQUENCE",
             "normalize": true,
-            "format_dates": false
+            "format_dates": true
         },
         "eval": {
             "dataset": "PASTIS24_fold1",
@@ -45,7 +45,7 @@
             "paths": "../PASTIS24/fold-paths/fold_5_paths.csv",
             "dataset_type": "PASTIS2SEQUENCE",
             "normalize": true,
-            "format_dates": false
+            "format_dates": true
         },
         "test": {
             "dataset": "PASTIS24_fold1",
