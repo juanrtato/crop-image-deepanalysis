@@ -1,4 +1,4 @@
-# Fusion of Computer Vision and Language Models for Knowledge Transfer in Precision Agriculture
+# 🤖Fusion of Computer Vision and Language Models for Knowledge Transfer in Precision Agriculture🌾
 
 **Authors**:  
 Juan Ricardo Albarracín Barbosa  
