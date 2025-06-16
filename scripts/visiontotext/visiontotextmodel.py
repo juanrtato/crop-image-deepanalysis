@@ -13,12 +13,12 @@ class VisionToTextModel(nn.Module):
         self.tokenizer = GPT2Tokenizer.from_pretrained(decoder_model)
         self.tokenizer.pad_token = self.tokenizer.eos_token
         self.device = next(self.parameters()).device
-        #self.projector = nn.Linear(input_dim, self.decoder.config.n_embd)
+        self.projector = nn.Linear(input_dim, self.decoder.config.n_embd)
         # Projection
-        self.projector = nn.Sequential(
-            nn.Dropout(0.1),  # Dropout for regularization
-            nn.Linear(input_dim, self.decoder.config.n_embd)  # Project visual embeddings to LLM dimension
-        )
+        #self.projector = nn.Sequential(
+        #    nn.Dropout(0.1),  # Dropout for regularization
+        #    nn.Linear(input_dim, self.decoder.config.n_embd)  # Project visual embeddings to LLM dimension
+        #)
         for param in self.encoder.parameters():
             param.requires_grad = False
 
