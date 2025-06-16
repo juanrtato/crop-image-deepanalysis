@@ -11,4 +11,7 @@ transformers==4.51.3
 hf-xet==1.1.1
 dateparser==1.2.1
 humanize==4.12.3
-unsloth==2025.6.1
+#unsloth==2025.6.1
+nltk==3.9.1
+bert-score==0.3.13
+unbabel-comet==2.2.6
