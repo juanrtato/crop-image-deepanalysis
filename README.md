@@ -1,4 +1,7 @@
 # 🤖Fusion of Computer Vision and Language Models for Knowledge Transfer in Precision Agriculture🌾
+<p align="center">
+  <img src="images/project_image.png" alt="Project Overview" width="200"/>
+</p>
 
 **Authors**:  
 Juan Ricardo Albarracín Barbosa  
